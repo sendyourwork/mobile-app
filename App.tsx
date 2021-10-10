@@ -20,18 +20,14 @@ export default function App() {
   const [isLoaded] = useFonts(customFonts);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const logIn = () => {
-    setIsLoggedIn(true);
-  }
-
   if(!isLoaded) return null;
 
   return (
     <MainView>
       {isLoggedIn ? 
-        <QRScanner />
+        <QRScanner logOut={() => setIsLoggedIn(false)}/>
         :
-        <LoginForm logIn={logIn}/>
+        <LoginForm logIn={() => setIsLoggedIn(true)}/>
       }
     </MainView>
   );
