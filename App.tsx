@@ -1,9 +1,10 @@
 import { useFonts } from 'expo-font';
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import LoginForm from './components/LoginForm';
+import QRScanner from './components/QRScanner';
 
-const StyledView = styled.View`
+const MainView = styled.View`
   background-color: #111111;
   height: 100%;
   display: flex;
@@ -17,14 +18,21 @@ const customFonts = {
 
 export default function App() {
   const [isLoaded] = useFonts(customFonts);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const logIn = () => {
+    setIsLoggedIn(true);
+  }
+
+  if(!isLoaded) return null;
 
   return (
-    <>
-      {isLoaded &&
-      <StyledView>
-        <LoginForm />
-      </StyledView>
+    <MainView>
+      {isLoggedIn ? 
+        <QRScanner />
+        :
+        <LoginForm logIn={logIn}/>
       }
-    </>
+    </MainView>
   );
 }

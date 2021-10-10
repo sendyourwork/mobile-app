@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { ActivityIndicator } from "react-native";
 import styled from "styled-components/native";
 
 const Form = styled.View`
@@ -25,12 +26,26 @@ const StyledText = styled.Text`
     font-size: 16px;
     font-family: 'JetBrains';
 `
+interface LoginFormProps {
+    logIn: () => void
+}
 
-export default function LoginForm() {
+export default function LoginForm({logIn}: LoginFormProps) {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handlePress = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            setIsLoading(false);
+            logIn();
+        }, 1000)
+    }
+    if(isLoading){
+        return (
+            <ActivityIndicator color="#4158D0" size="large" />
+        )
     }
 
     return (
@@ -39,7 +54,7 @@ export default function LoginForm() {
             <Input secureTextEntry={true} defaultValue={password} placeholder="Password" onChangeText={(text: string) => setPassword(text)}/>
             <StyledButton onPress={handlePress}>
                 <StyledText>
-                    Login 
+                    Log in 
                 </StyledText>
             </StyledButton>
         </Form>
