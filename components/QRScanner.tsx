@@ -4,6 +4,7 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import { useEffect, useState } from "react";
 import { Dimensions, Image, View } from "react-native";
 import styled from "styled-components/native";
+import { useIsFocused } from "@react-navigation/core";
 
 interface sizeProps {
     size: number
@@ -15,22 +16,18 @@ const StyledText = styled.Text`
     font-family: 'JetBrains';
 `
 const Header = styled(StyledText)`
-    font-size: 20px;
+    font-size: 22px;
+    margin-top: 30px;
     text-align:center;
 `
 const StyledCamera = styled(Camera)`
-    margin:20px auto;
+    margin:0 auto;
+    margin-top: 25px;
     width: ${(props: sizeProps) => props.size}px;
     height: ${(props: sizeProps) => props.size}px;
 `
 
-const StyledButton = styled.TouchableOpacity`
-    background-color: #4158D0;
-    position: absolute;
-    right: 5%;
-    top: 5%;
-    padding: 10px;
-    border-radius: 20px;
+const StyledView = styled.View`
 `
 
 interface QRScannerProps {
@@ -40,6 +37,7 @@ interface QRScannerProps {
 export default function QRScanner({ logOut }: QRScannerProps) {
     const [hasPermission, setHasPermission] = useState<Boolean | null>(null);
     const [scanned, setScanned] = useState(false);
+    const isFocused = useIsFocused();
 
     const { width } = Dimensions.get('window');
 
@@ -62,19 +60,17 @@ export default function QRScanner({ logOut }: QRScannerProps) {
 
     return (
         <>
-            <StyledButton onPress={logOut}>
-                <Image source={require('../assets/logout.png')} resizeMode="contain"/>
-            </StyledButton>
-            <View>
+            <StyledView>
                 <Header>Scan QR code to log in</Header>
-                <StyledCamera
+                {isFocused && <StyledCamera
                     onBarCodeScanned = {scanned ? undefined : handleScanned}
                     barCodeScannerSettings = {{
                         barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr]
                     }}
                     size = {width * 0.8}
                 />
-            </View>
+                }
+            </StyledView>
         </>
     )
 }
