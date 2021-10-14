@@ -9,7 +9,6 @@ import QRScanner from './components/QRScanner';
 import 'react-native-gesture-handler';
 import Chat from './components/Chat';
 import Drive from './components/Drive';
-import SendEmail from './components/SendEmail';
 
 const MainView = styled.View`
   background-color: #111111;
@@ -51,7 +50,6 @@ export default function App() {
               <Drawer.Screen name="QR" component={QRScanner} options={{title: 'Log in with QR code'}}/>
               <Drawer.Screen name="Chat" component={Chat}/>
               <Drawer.Screen name="Drive" component={Drive}/>
-              <Drawer.Screen name="Send email" component={SendEmail}/>
             </Drawer.Navigator>
           :
           <MainView>
