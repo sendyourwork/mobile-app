@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import styled from "styled-components/native"
 import * as DocumentPicker from 'expo-document-picker';
-import { View } from "react-native";
+import { View, Button, Text, TouchableOpacity } from "react-native";
 
 const MainView = styled.View`
     padding:5px 10px;
@@ -38,6 +38,7 @@ const FileContainer = styled.View`
     background-color: #222222;
     margin-top: 15px;
     flex-direction: row;
+    align-items: center;
 `
 const FileName = styled.Text`
     color: white;
@@ -55,6 +56,12 @@ const DownloadButton = styled.TouchableOpacity`
 const DownloadImage = styled.Image`
     width: 30px;
     height: 30px;
+`
+const Messages = styled.ScrollView`
+
+`
+const RemoveFileText = styled.Text`
+    color: rgb(37, 99, 235);
 `
 
 export default function Drive() {
@@ -91,6 +98,12 @@ export default function Drive() {
         }
         //FIles to FormData and backend connect 
     }
+    const downloadFile = (id: string) => {
+        //Logic for downloading file from server
+    }
+    const removeFile = (id: string) => {
+        //Logic for removing file from server
+    }
     return (
         <MainView>
             <StyledButton onPress={addNewFile}>
@@ -98,19 +111,24 @@ export default function Drive() {
                 <ButtonText>Add new file</ButtonText>
             </StyledButton>
             {error && <Error>{error}</Error>}
+            <Messages>
             {files.map(({name, size, id}) => {
                 return (
                     <FileContainer key={id}>
                         <View style={{flex:1}}>
                             <FileName>{name}</FileName>
                             <FileSize>{size}</FileSize>
+                            <TouchableOpacity onPress={() => removeFile(id)}>
+                                <RemoveFileText>Remove file</RemoveFileText>
+                            </TouchableOpacity>
                         </View>
-                        <DownloadButton>
+                        <DownloadButton onPress={() => downloadFile(id)}>
                             <DownloadImage source={require('../assets/download.png')} />
                         </DownloadButton>
                     </FileContainer>
                 )
             })}
+            </Messages>
         </MainView>
     )
 }
