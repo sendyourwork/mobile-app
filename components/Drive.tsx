@@ -64,6 +64,23 @@ const RemoveFileText = styled.Text`
     color: rgb(37, 99, 235);
 `
 
+const ButtonsView = styled.View`
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+`
+
+const RefreshButton = styled.TouchableOpacity`
+    padding:5px;
+    border-radius: 10px;
+    align-items: center;
+    margin-top: 5px;
+`
+const RefreshImage = styled.Image`
+    width: 24px;
+    height: 24px;
+`
+
 export default function Drive() {
     const [error, setError] = useState<string | null>(null);
     const [files, setFiles] = useState([
@@ -86,6 +103,10 @@ export default function Drive() {
         uri: string
     }
 
+    const getFileList = () => {
+        //get files from backend
+    }
+
     const addNewFile = async () => {
         const file = await DocumentPicker.getDocumentAsync();
         console.log(file);
@@ -106,10 +127,15 @@ export default function Drive() {
     }
     return (
         <MainView>
-            <StyledButton onPress={addNewFile}>
-                <StyledImage source={require('../assets/add.png')}/>
-                <ButtonText>Add new file</ButtonText>
-            </StyledButton>
+            <ButtonsView>
+                <StyledButton onPress={addNewFile}>
+                    <StyledImage source={require('../assets/add.png')}/>
+                    <ButtonText>Add new file</ButtonText>
+                </StyledButton>
+                <RefreshButton onPress={getFileList}>
+                    <RefreshImage source={require('../assets/refresh.png')}/>
+                </RefreshButton>
+            </ButtonsView>
             {error && <Error>{error}</Error>}
             <Messages>
             {files.map(({name, size, id}) => {
