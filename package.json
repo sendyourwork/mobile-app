@@ -29,7 +29,8 @@
     "react-native-screens": "~3.4.0",
     "react-native-web": "~0.13.12",
     "styled-components": "^5.3.1",
-    "expo-document-picker": "~9.2.4"
+    "expo-document-picker": "~9.2.4",
+    "expo-secure-store": "~10.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

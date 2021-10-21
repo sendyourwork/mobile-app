@@ -1,6 +1,9 @@
-import React, { useState } from "react"
+import React, { SetStateAction, useState } from "react"
 import { ActivityIndicator } from "react-native";
 import styled from "styled-components/native";
+import loginWithNameAndPassword from "../utils/loginWithUsernameAndPassword";
+import * as SecureStore from 'expo-secure-store';
+import { User } from "../interfaces/user";
 
 const Form = styled.View`
     width: 80%;
@@ -26,21 +29,38 @@ const StyledText = styled.Text`
     font-size: 16px;
     font-family: 'JetBrains';
 `
+const Error = styled.Text`
+    color: red;
+    text-align: center;
+`
+
 interface LoginFormProps {
-    logIn: () => void
+    setUserData: any
 }
 
-export default function LoginForm({logIn}: LoginFormProps) {
+export default function LoginForm({setUserData}: LoginFormProps) {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handlePress = () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            logIn();
-        }, 1000)
+    const handlePress = async () => {
+        if(login && password) {
+            setIsLoading(true);
+            const res = await loginWithNameAndPassword(login, password);
+            
+            if(res.accessToken) {
+                await SecureStore.setItemAsync('token', res.accessToken)
+                setUserData(res);
+            }
+            else {
+                setError(res.errors[0].msg);
+                setIsLoading(false);
+            }
+        }
+        else {
+            setError("Username and password cannot be empty");
+        }
     }
     if(isLoading){
         return (
@@ -52,6 +72,7 @@ export default function LoginForm({logIn}: LoginFormProps) {
         <Form>
             <Input defaultValue={login} placeholder="Your name" onChangeText={(text: string) => setLogin(text)}/>
             <Input secureTextEntry={true} defaultValue={password} placeholder="Password" onChangeText={(text: string) => setPassword(text)}/>
+            {error && <Error>{error}</Error>}
             <StyledButton onPress={handlePress}>
                 <StyledText>
                     Log in 

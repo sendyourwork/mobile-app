@@ -1,7 +1,7 @@
 import { DarkTheme,  NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useFonts } from 'expo-font';
-import React, { useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import LoginForm from './components/LoginForm';
 import LogOutButton from './components/LogOutButton';
@@ -9,6 +9,9 @@ import QRScanner from './components/QRScanner';
 import 'react-native-gesture-handler';
 import Chat from './components/Chat';
 import Drive from './components/Drive';
+import { User } from './interfaces/user';
+import * as SecureStore from 'expo-secure-store';
+import getUserData from './utils/getUserData';
 
 const MainView = styled.View`
   background-color: #111111;
@@ -26,20 +29,30 @@ const Drawer = createDrawerNavigator();
 
 export default function App() {
   const [isLoaded] = useFonts(customFonts);
-  const [userToken, setUserToken] = useState<null | string>(null);
+  const [userData, setUserData] = useState<null | User>(null);
 
-  const handleLogIn = () => {
-    setUserToken("dkalkoldka");
+  const handleLogOut = async () => {
+    await SecureStore.deleteItemAsync('token');
+    setUserData(null);
   }
 
-  const handleLogOut = () => {
-    setUserToken(null);
-  }
+  useEffect(() => {
+    (async () => {
+      const token = await SecureStore.getItemAsync('token');
+      if(token) {
+        const res = await getUserData(token);
+        if(res.user) {
+          setUserData(res.user);
+        }
+      }
+    })()
+    
+  }, [])
   if(!isLoaded) return null;
 
   return (
     <NavigationContainer theme={DarkTheme}>
-        {userToken ? 
+        {userData ? 
             <Drawer.Navigator 
               initialRouteName="QR"
               screenOptions={{
@@ -53,7 +66,7 @@ export default function App() {
             </Drawer.Navigator>
           :
           <MainView>
-            <LoginForm logIn={handleLogIn}/>
+            <LoginForm setUserData={setUserData}/>
           </MainView>
         }
     </NavigationContainer>
