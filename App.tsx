@@ -27,6 +27,8 @@ const customFonts = {
 
 const Drawer = createDrawerNavigator();
 
+export const UserContext = createContext<undefined | User>(undefined);
+
 export default function App() {
   const [isLoaded] = useFonts(customFonts);
   const [userData, setUserData] = useState<null | User>(null);
@@ -53,6 +55,7 @@ export default function App() {
   return (
     <NavigationContainer theme={DarkTheme}>
         {userData ? 
+          <UserContext.Provider value={userData}>
             <Drawer.Navigator 
               initialRouteName="QR"
               screenOptions={{
@@ -64,6 +67,7 @@ export default function App() {
               <Drawer.Screen name="Chat" component={Chat}/>
               <Drawer.Screen name="Drive" component={Drive}/>
             </Drawer.Navigator>
+          </UserContext.Provider>
           :
           <MainView>
             <LoginForm setUserData={setUserData}/>
