@@ -123,11 +123,11 @@ export default function Drive() {
             setIsUploading(true);
             const filesToSend = new FormData();
             for (let i = 0; files.length > i; i++) {
-                filesToSend.append("files", files[i]);
+                // filesToSend.append("files", files[i]);
             }
             const response = await homeDriveUpload(filesToSend);
             if (response?.status) {
-                setFiles([...files, file]);
+                // setFiles([...files, file]);
                 setIsUploading(false);
             }
             else {
@@ -137,10 +137,10 @@ export default function Drive() {
         }
         //FIles to FormData and backend connect 
     }
-    const downloadFile = (id: string) => {
+    const downloadFile = (name: string) => {
         //Logic for downloading file from server
     }
-    const removeFile = (id: string) => {
+    const removeFile = (name: string) => {
         //Logic for removing file from server
     }
     return (
@@ -161,17 +161,17 @@ export default function Drive() {
             </ButtonsView>
             {error && <Error>{error}</Error>}
             <Messages>
-            {files.map(({name, size, id}) => {
+            {files.map(({name, size }, index) => {
                 return (
-                    <FileContainer key={id}>
+                    <FileContainer key={index}>
                         <View style={{flex:1}}>
                             <FileName>{name}</FileName>
                             <FileSize>{size}</FileSize>
-                            <TouchableOpacity onPress={() => removeFile(id)}>
+                            <TouchableOpacity onPress={() => removeFile(name)}>
                                 <RemoveFileText>Remove file</RemoveFileText>
                             </TouchableOpacity>
                         </View>
-                        <DownloadButton onPress={() => downloadFile(id)}>
+                        <DownloadButton onPress={() => downloadFile(name)}>
                             <DownloadImage source={require('../assets/download.png')} />
                         </DownloadButton>
                     </FileContainer>

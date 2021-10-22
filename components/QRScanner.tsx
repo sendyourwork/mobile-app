@@ -1,13 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Camera } from "expo-camera"
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { useEffect, useState } from "react";
-import { Dimensions, Image, View } from "react-native";
+import { Dimensions } from "react-native";
 import styled from "styled-components/native";
 import { useIsFocused } from "@react-navigation/core";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { BACKEND_URL } from "../config";
-import { UserContext } from "../App";
 import * as SecureStore from 'expo-secure-store';
 
 interface sizeProps {
@@ -34,15 +33,10 @@ const StyledCamera = styled(Camera)`
 const StyledView = styled.View`
 `
 
-interface QRScannerProps {
-    logOut: () => void
-}
-
-export default function QRScanner({ logOut }: QRScannerProps) {
+export default function QRScanner() {
     const [hasPermission, setHasPermission] = useState<Boolean | null>(null);
     const [scanned, setScanned] = useState(false);
     const isFocused = useIsFocused();
-    const user = useContext(UserContext);
     const { width } = Dimensions.get('window');
 
     useEffect(() => {
@@ -61,12 +55,13 @@ export default function QRScanner({ logOut }: QRScannerProps) {
             }
         });
         socket.emit('qr-scanned', { accessToken, id: data});
-        alert("Login request successfully sent!")
-
+        alert("Login request successfully sent!");
         setTimeout(() => {
             setScanned(false);
-            socket.disconnect();
         }, 5000);
+        return () => {
+            socket.disconnect();
+        }
     }
 
     if(hasPermission === null) return <StyledText>Requesting for camera permission</StyledText>

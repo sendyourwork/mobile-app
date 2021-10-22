@@ -43,13 +43,6 @@ const MessageContainer = styled.View`
 const SomeoneMessage = styled(Message)`
     background-color: white;
 `
-const AvatarPlaceholder = styled.View`
-    width: 30px;
-    height: 30px;
-    border-radius: 30px;
-    background-color: white;
-    margin-right: 5px;
-`
 
 const SendContainer = styled.View`
     display:flex;
@@ -67,6 +60,11 @@ const SendButton = styled.TouchableOpacity`
 const MessagesView = styled.ScrollView`
     padding: 5px;
     flex: 1;
+`
+
+const Nick = styled.Text`
+    color: grey;
+    margin-left: 3px;
 `
 
 export default function Chat(): JSX.Element {
@@ -98,7 +96,7 @@ export default function Chat(): JSX.Element {
             const token = await SecureStore.getItemAsync('token');
             const newSocket = io(BACKEND_URL, {
                 extraHeaders: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             newSocket.on('chat-msg-server',(msg: MessageI) => {
@@ -127,8 +125,8 @@ export default function Chat(): JSX.Element {
                     }
                     return (
                         <MessageContainer key={index}>
-                            <AvatarPlaceholder></AvatarPlaceholder>
                             <View style={{ alignItems: 'baseline' }}>
+                                {username !== messages[index - 1]?.username && <Nick>{username}</Nick>}
                                 <SomeoneMessage>
                                     <Text>{msg}</Text>
                                 </SomeoneMessage>

@@ -12,6 +12,7 @@ import Drive from './components/Drive';
 import { User } from './interfaces/user';
 import * as SecureStore from 'expo-secure-store';
 import getUserData from './utils/getUserData';
+import { ActivityIndicator } from 'react-native';
 
 const MainView = styled.View`
   background-color: #111111;
@@ -32,6 +33,7 @@ export const UserContext = createContext<undefined | User>(undefined);
 export default function App() {
   const [isLoaded] = useFonts(customFonts);
   const [userData, setUserData] = useState<null | User>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleLogOut = async () => {
     await SecureStore.deleteItemAsync('token');
@@ -47,10 +49,18 @@ export default function App() {
           setUserData(res.user);
         }
       }
+      setIsLoading(false);
     })()
-    
   }, [])
   if(!isLoaded) return null;
+
+  if(isLoading) {
+    return (
+      <MainView>
+        <ActivityIndicator size="large"/>
+      </MainView>
+    )
+  }
 
   return (
     <NavigationContainer theme={DarkTheme}>
