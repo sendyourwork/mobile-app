@@ -60,12 +60,12 @@ export default function QRScanner({ logOut }: QRScannerProps) {
                 Authorization: "Bearer " + accessToken
             }
         });
-        
         socket.emit('qr-scanned', { accessToken, id: data});
-        
-        socket.disconnect();
+        alert("Login request successfully sent!")
+
         setTimeout(() => {
             setScanned(false);
+            socket.disconnect();
         }, 5000);
     }
 

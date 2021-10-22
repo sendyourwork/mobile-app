@@ -1,7 +1,8 @@
 import React, { useState } from "react"
 import styled from "styled-components/native"
 import * as DocumentPicker from 'expo-document-picker';
-import { View, Button, Text, TouchableOpacity } from "react-native";
+import { View, Button, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import homeDriveUpload from "../utils/homeDriveFileUpload";
 
 const MainView = styled.View`
     padding:5px 10px;
@@ -68,6 +69,7 @@ const ButtonsView = styled.View`
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    position: relative;
 `
 
 const RefreshButton = styled.TouchableOpacity`
@@ -81,27 +83,27 @@ const RefreshImage = styled.Image`
     height: 24px;
 `
 
+const LoadingView = styled.View`
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255, 0.8);
+`
+interface FileFromDocumentPicker {
+    type: "cancel" | "success" | "error",
+    name: string,
+    size: number,
+    uri: string
+}
+
 export default function Drive() {
     const [error, setError] = useState<string | null>(null);
-    const [files, setFiles] = useState([
-        {
-            id: "amfmfakm",
-            name: "fmaklmfakmlaf",
-            size: "7 MB"
-        },
-        {
-            id: "amfm",
-            name: "fmaklmfakmlaf",
-            size: "7 MB"
-        }
-    ])
-
-    interface FileFromDocumentPicker {
-        type: "cancel" | "success" | "error",
-        name: string,
-        size: number,
-        uri: string
-    }
+    const [files, setFiles] = useState<FileFromDocumentPicker[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
 
     const getFileList = () => {
         //get files from backend
@@ -116,6 +118,22 @@ export default function Drive() {
             setTimeout(() => {
                 setError(null);
             }, 5000)
+        }
+        else {
+            setIsUploading(true);
+            const filesToSend = new FormData();
+            for (let i = 0; files.length > i; i++) {
+                filesToSend.append("files", files[i]);
+            }
+            const response = await homeDriveUpload(filesToSend);
+            if (response?.status) {
+                setFiles([...files, file]);
+                setIsUploading(false);
+            }
+            else {
+                setError(response.message || "Something went wrong!");
+                setIsUploading(false);
+            }
         }
         //FIles to FormData and backend connect 
     }
@@ -135,6 +153,11 @@ export default function Drive() {
                 <RefreshButton onPress={getFileList}>
                     <RefreshImage source={require('../assets/refresh.png')}/>
                 </RefreshButton>
+                {isUploading &&
+                    <LoadingView>
+                        <ActivityIndicator size="large"/>
+                    </LoadingView>
+                }
             </ButtonsView>
             {error && <Error>{error}</Error>}
             <Messages>

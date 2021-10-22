@@ -1,7 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
+import { io, Socket } from "socket.io-client";
 import styled from "styled-components/native";
+import { UserContext } from "../App";
+import { BACKEND_URL } from "../config";
 import { Message as MessageI} from "../interfaces/message"
+import * as SecureStore from "expo-secure-store"
 
 const Message = styled.Text`
     font-size: 16px;
@@ -67,27 +71,17 @@ const MessagesView = styled.ScrollView`
 
 export default function Chat(): JSX.Element {
     const [inputValue, setInputValue] = useState('');
-    const [messages, setMessages] = useState<MessageI[]>(
-        [
-            {
-                messageId: "adadaaddad",
-                senderId: "abcd123",
-                senderIcon: "dakdaj",
-                message: "Wilczur OP"
-            },
-            {
-                messageId: "daoadjdajoda",
-                senderId: "Artiu",
-                senderIcon: "adadad",
-                message: "Wilczur Giga OP"
-            }
-        ]);
+    const [messages, setMessages] = useState<MessageI[]>([]);
+    const [socket, setSocket] = useState<any>(null);
     const chatRef = useRef<ScrollView>(null);
-    const clientId = "Artiu";
+    const user = useContext(UserContext);
 
     const handleSubmit = () => {
         if (inputValue) {
-            setMessages([...messages, { messageId: String(messages.length), senderId: clientId, message: inputValue, senderIcon: "ojaofa" }]);
+            socket?.emit('chat-msg-client', {
+                msg:inputValue,
+                username: user?.username
+            });
             setInputValue('');
         }
     }
@@ -99,25 +93,44 @@ export default function Chat(): JSX.Element {
         chatRef.current?.scrollToEnd();
     }, [messages])
 
+    useEffect(() => {
+        (async() => {
+            const token = await SecureStore.getItemAsync('token');
+            const newSocket = io(BACKEND_URL, {
+                extraHeaders: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            newSocket.on('chat-msg-server',(msg: MessageI) => {
+                setMessages(prevMessages => [...prevMessages, msg]);
+            })
+            setSocket(newSocket);
+            return () => {
+                newSocket.disconnect();
+            }
+        })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
     return (
         <MainView>
             <MessagesView ref={chatRef} contentContainerStyle={{paddingBottom: 15}}>
-                {messages.map(({ messageId, senderId, senderIcon, message }: MessageI) => {
-                    if (clientId === senderId) {
+                {messages.map(({ msg, username }: MessageI, index) => {
+                    if (username === user?.username) {
                         return (
-                            <View key={messageId} style={{ alignItems: 'baseline' }}>
+                            <View key={index} style={{ alignItems: 'baseline' }}>
                                 <MyMessage>
-                                    <Text>{message}</Text>
+                                    <Text>{msg}</Text>
                                 </MyMessage>
                             </View>
                         )
                     }
                     return (
-                        <MessageContainer key={messageId}>
+                        <MessageContainer key={index}>
                             <AvatarPlaceholder></AvatarPlaceholder>
                             <View style={{ alignItems: 'baseline' }}>
                                 <SomeoneMessage>
-                                    <Text>{message}</Text>
+                                    <Text>{msg}</Text>
                                 </SomeoneMessage>
                             </View>
                         </MessageContainer>
