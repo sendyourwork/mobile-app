@@ -1,8 +1,16 @@
-import React, { useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import styled from "styled-components/native"
 import * as DocumentPicker from 'expo-document-picker';
-import { View, Button, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View,  TouchableOpacity, ActivityIndicator } from "react-native";
 import homeDriveUpload from "../utils/homeDriveFileUpload";
+import { UserContext } from "../App";
+import homeDriveGetFiles from "../utils/homeDriveGetFiles";
+import formatFileSize from "../helpers/formatFileSize";
+import homeDriveFileRemove from "../utils/homeDriveFileRemove";
+import homeDriveFileDownload from "../utils/homeDriveFileDownload";
+import * as Permissions from 'expo-permissions';
+import * as FileSystem from 'expo-file-system';
+import { User } from "../interfaces/user";
 
 const MainView = styled.View`
     padding:5px 10px;
@@ -18,6 +26,7 @@ const StyledButton = styled.TouchableOpacity`
     flex-direction: row;
     align-items: center;
     margin-top: 5px;
+    position: relative;
 `
 const ButtonText = styled.Text`
     color: white;
@@ -58,7 +67,7 @@ const DownloadImage = styled.Image`
     width: 30px;
     height: 30px;
 `
-const Messages = styled.ScrollView`
+const Files = styled.ScrollView`
 
 `
 const RemoveFileText = styled.Text`
@@ -69,7 +78,6 @@ const ButtonsView = styled.View`
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    position: relative;
 `
 
 const RefreshButton = styled.TouchableOpacity`
@@ -83,16 +91,6 @@ const RefreshImage = styled.Image`
     height: 24px;
 `
 
-const LoadingView = styled.View`
-    position: absolute;
-    align-items: center;
-    justify-content: center;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255,255,255, 0.8);
-`
 interface FileFromDocumentPicker {
     type: "cancel" | "success" | "error",
     name: string,
@@ -102,71 +100,74 @@ interface FileFromDocumentPicker {
 
 export default function Drive() {
     const [error, setError] = useState<string | null>(null);
-    const [files, setFiles] = useState<FileFromDocumentPicker[]>([]);
-    const [isUploading, setIsUploading] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
+    const { username } = useContext(UserContext) as User;
 
-    const getFileList = () => {
-        //get files from backend
+    const getFileList = async () => {
+        const data = await homeDriveGetFiles(username);
+        setFiles(data);
     }
 
     const addNewFile = async () => {
-        const file = await DocumentPicker.getDocumentAsync();
-        console.log(file);
+        const file = await DocumentPicker.getDocumentAsync({
+            copyToCacheDirectory: false
+        });
         const MAX_SIZE = 1024 * 1024 * 10;
-        if((file as FileFromDocumentPicker).size > MAX_SIZE) {
-            setError("Your file weights more than 10 MB");
+        if(file.type === "success") {
+            if((file as FileFromDocumentPicker).size > MAX_SIZE) {
+                setError("Your file weights more than 10 MB");
+            }
+            else {  
+                const response = await homeDriveUpload(file);
+
+                if (response.status) {
+                    setFiles([...response.data, ...files]);
+                }
+                else {
+                    setError(response.message || "Something went wrong!");
+                }
+            }
             setTimeout(() => {
                 setError(null);
             }, 5000)
         }
-        else {
-            setIsUploading(true);
-            const filesToSend = new FormData();
-            for (let i = 0; files.length > i; i++) {
-                // filesToSend.append("files", files[i]);
-            }
-            const response = await homeDriveUpload(filesToSend);
-            if (response?.status) {
-                // setFiles([...files, file]);
-                setIsUploading(false);
-            }
-            else {
-                setError(response.message || "Something went wrong!");
-                setIsUploading(false);
-            }
+    }
+    const downloadFile = async (name: string) => {
+        const perm = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
+        if(perm.status === 'granted') {
+            await homeDriveFileDownload(name, username);
         }
-        //FIles to FormData and backend connect 
     }
-    const downloadFile = (name: string) => {
-        //Logic for downloading file from server
+    const removeFile = async (name: string) => {
+        const response = await homeDriveFileRemove(name, username);
+        if (response === "OK") {
+            setFiles(files.filter((item) => item.name !== name));
+        }
     }
-    const removeFile = (name: string) => {
-        //Logic for removing file from server
-    }
+
+    useEffect(() => {
+        getFileList();
+    }, [])
+
     return (
         <MainView>
             <ButtonsView>
                 <StyledButton onPress={addNewFile}>
                     <StyledImage source={require('../assets/add.png')}/>
-                    <ButtonText>Add new file</ButtonText>
+                    <ButtonText>Add new file</ButtonText> 
                 </StyledButton>
                 <RefreshButton onPress={getFileList}>
                     <RefreshImage source={require('../assets/refresh.png')}/>
                 </RefreshButton>
-                {isUploading &&
-                    <LoadingView>
-                        <ActivityIndicator size="large"/>
-                    </LoadingView>
-                }
             </ButtonsView>
             {error && <Error>{error}</Error>}
-            <Messages>
+            <Files>
             {files.map(({name, size }, index) => {
                 return (
                     <FileContainer key={index}>
                         <View style={{flex:1}}>
                             <FileName>{name}</FileName>
-                            <FileSize>{size}</FileSize>
+                            <FileSize>{formatFileSize(size)}</FileSize>
                             <TouchableOpacity onPress={() => removeFile(name)}>
                                 <RemoveFileText>Remove file</RemoveFileText>
                             </TouchableOpacity>
@@ -177,7 +178,7 @@ export default function Drive() {
                     </FileContainer>
                 )
             })}
-            </Messages>
+            </Files>
         </MainView>
     )
 }

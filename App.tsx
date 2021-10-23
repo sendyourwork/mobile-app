@@ -28,7 +28,7 @@ const customFonts = {
 
 const Drawer = createDrawerNavigator();
 
-export const UserContext = createContext<undefined | User>(undefined);
+export const UserContext = createContext<null | undefined | User>(undefined);
 
 export default function App() {
   const [isLoaded] = useFonts(customFonts);
