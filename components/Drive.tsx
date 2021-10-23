@@ -9,7 +9,7 @@ import formatFileSize from "../helpers/formatFileSize";
 import homeDriveFileRemove from "../utils/homeDriveFileRemove";
 import homeDriveFileDownload from "../utils/homeDriveFileDownload";
 import * as Permissions from 'expo-permissions';
-import * as FileSystem from 'expo-file-system';
+
 import { User } from "../interfaces/user";
 
 const MainView = styled.View`
@@ -161,7 +161,7 @@ export default function Drive() {
                 </RefreshButton>
             </ButtonsView>
             {error && <Error>{error}</Error>}
-            <Files>
+            <Files contentContainerStyle={{paddingBottom: 50}}>
             {files.map(({name, size }, index) => {
                 return (
                     <FileContainer key={index}>
