@@ -1,6 +1,8 @@
+<p align="center">
 [![forthebadge](https://forthebadge.com/images/badges/built-for-android.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-typescript.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
+ </p>
 # <p align="center">📱 SendYourWork aplikacja mobilna</p>
 ---------------
 ## 🖥️ Użyte technologie 
