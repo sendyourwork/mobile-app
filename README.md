@@ -18,6 +18,13 @@
   - Możliwość rejestracji
   - Dostęp do klasowego dysku
   - System zaproszeń do klasy 
+  - Wrzucenie aplikacji na Google Play
+  - Kompatybilność z IOS
+  - Wrzucenie aplikacji na App Store
 ## ⚙️ Działanie aplikacji 
+  - Wbudowany prywanty dysk użytkownika
+  - Czat 
   - Logowanie za pomocą kodu QR
+## Instalacja
+  - Link do pobrania .apk - https://send-your.works:3000/SendYourWork.apk 
 
