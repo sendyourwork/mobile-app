@@ -17,7 +17,7 @@ export default async function homeDriveUpload(file: FileFromDocumentPicker) {
         to: uri
     })
     const res = await FileSystem.uploadAsync(
-        BACKEND_URL + "/upload",
+        BACKEND_URL + "/userfiles",
         uri,
         {
             headers: { "Authorization": "Bearer " + token },

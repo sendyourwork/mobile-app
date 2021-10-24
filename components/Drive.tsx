@@ -101,11 +101,14 @@ interface FileFromDocumentPicker {
 export default function Drive() {
     const [error, setError] = useState<string | null>(null);
     const [files, setFiles] = useState<File[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const { username } = useContext(UserContext) as User;
 
     const getFileList = async () => {
+        setIsLoading(true);
         const data = await homeDriveGetFiles(username);
         setFiles(data);
+        setIsLoading(false);
     }
 
     const addNewFile = async () => {
@@ -114,6 +117,7 @@ export default function Drive() {
         });
         const MAX_SIZE = 1024 * 1024 * 10;
         if(file.type === "success") {
+            setIsLoading(true);
             if((file as FileFromDocumentPicker).size > MAX_SIZE) {
                 setError("Your file weights more than 10 MB");
             }
@@ -127,6 +131,7 @@ export default function Drive() {
                     setError(response.message || "Something went wrong!");
                 }
             }
+            setIsLoading(false);
             setTimeout(() => {
                 setError(null);
             }, 5000)
@@ -135,14 +140,18 @@ export default function Drive() {
     const downloadFile = async (name: string) => {
         const perm = await Permissions.askAsync(Permissions.MEDIA_LIBRARY);
         if(perm.status === 'granted') {
+            setIsLoading(true);
             await homeDriveFileDownload(name, username);
+            setIsLoading(false);
         }
     }
     const removeFile = async (name: string) => {
+        setIsLoading(true);
         const response = await homeDriveFileRemove(name, username);
         if (response === "OK") {
             setFiles(files.filter((item) => item.name !== name));
         }
+        setIsLoading(false);
     }
 
     useEffect(() => {
@@ -162,22 +171,28 @@ export default function Drive() {
             </ButtonsView>
             {error && <Error>{error}</Error>}
             <Files contentContainerStyle={{paddingBottom: 50}}>
-            {files.map(({name, size }, index) => {
-                return (
-                    <FileContainer key={index}>
-                        <View style={{flex:1}}>
-                            <FileName>{name}</FileName>
-                            <FileSize>{formatFileSize(size)}</FileSize>
-                            <TouchableOpacity onPress={() => removeFile(name)}>
-                                <RemoveFileText>Remove file</RemoveFileText>
-                            </TouchableOpacity>
-                        </View>
-                        <DownloadButton onPress={() => downloadFile(name)}>
-                            <DownloadImage source={require('../assets/download.png')} />
-                        </DownloadButton>
-                    </FileContainer>
-                )
-            })}
+            {isLoading ?
+                <View style={{paddingTop: 50, justifyContent: 'center'}}>
+                    <ActivityIndicator size="large" color="#4158D0"/>
+                </View>
+                    :
+                files.map(({name, size }, index) => {
+                    return (
+                        <FileContainer key={index}>
+                            <View style={{flex:1}}>
+                                <FileName>{name}</FileName>
+                                <FileSize>{formatFileSize(size)}</FileSize>
+                                <TouchableOpacity onPress={() => removeFile(name)}>
+                                    <RemoveFileText>Remove file</RemoveFileText>
+                                </TouchableOpacity>
+                            </View>
+                            <DownloadButton onPress={() => downloadFile(name)}>
+                                <DownloadImage source={require('../assets/download.png')} />
+                            </DownloadButton>
+                        </FileContainer>
+                    )
+                })   
+            }
             </Files>
         </MainView>
     )

@@ -52,12 +52,11 @@ export default function App() {
       setIsLoading(false);
     })()
   }, [])
-  if(!isLoaded) return null;
 
-  if(isLoading) {
+  if(isLoading || !isLoaded) {
     return (
       <MainView>
-        <ActivityIndicator size="large"/>
+        <ActivityIndicator size="large" color="#4158D0"/>
       </MainView>
     )
   }

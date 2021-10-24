@@ -1,11 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Image, ScrollView, Text, View } from "react-native";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import styled from "styled-components/native";
 import { UserContext } from "../App";
 import { BACKEND_URL } from "../config";
 import { Message as MessageI} from "../interfaces/message"
 import * as SecureStore from "expo-secure-store"
+import getChatMessages from "../utils/getChatMessages";
+import { User } from "../interfaces/user";
 
 const Message = styled.Text`
     font-size: 16px;
@@ -93,6 +95,8 @@ export default function Chat(): JSX.Element {
 
     useEffect(() => {
         (async() => {
+            const res = await getChatMessages((user as User).school_class);
+            setMessages(res);
             const token = await SecureStore.getItemAsync('token');
             const newSocket = io(BACKEND_URL, {
                 extraHeaders: {
