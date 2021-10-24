@@ -5,6 +5,8 @@
 
 # <p align="center">📱 SendYourWork aplikacja mobilna</p>
 ---------------
+## ⚙️ Działanie aplikacji 
+Logowanie z wcześniej utworzonego konta na stronie [SendYourWork](https://send-your.works) by następnie przy logowaniu na nie prywatnym komputerze zeskanować kod QR i nie narażać się na utratę danych. Przesyłanie plików z telefonu na prywatny dysk.
 ## 🖥️ Użyte technologie 
   - React Native
   - Expo
@@ -21,10 +23,6 @@
   - Wrzucenie aplikacji na Google Play
   - Kompatybilność z IOS
   - Wrzucenie aplikacji na App Store
-## ⚙️ Działanie aplikacji 
-  - Wbudowany prywanty dysk użytkownika
-  - Czat 
-  - Logowanie za pomocą kodu QR
 ## Instalacja
   - Link do pobrania .apk - https://send-your.works:3000/SendYourWork.apk 
 
