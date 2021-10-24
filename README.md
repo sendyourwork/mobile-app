@@ -8,7 +8,7 @@
 ## 🖥️ Użyte technologie 
   - React Native
   - Expo
-  - Packages
+  - Zależności:
       - [Expo Camera](https://docs.expo.dev/versions/latest/sdk/camera/)
       - [Styled Componets](https://styled-components.com)
       - [Expo Gesture Handler](https://docs.expo.dev/versions/latest/sdk/gesture-handler/)
