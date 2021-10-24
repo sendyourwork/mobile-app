@@ -1,6 +1,12 @@
-# <p align="center">📱 SendYourWork mobile app</p>
+# <p align="center">📱 SendYourWork aplikacja mobilna</p>
 ---------------
-## 🚀 Plans for future:
-  - New Design
-  - Add Register
-  - Add Access To Class Drive
+## 🖥️ Użyte technologie 
+  - React Native
+## 🚀 Plany na przyszłość:
+  - Nowy desing 
+  - Możliwość rejestracji
+  - Dostęp do klasowego dysku
+  - System zaproszeń do klasy 
+## ⚙️ Działanie aplikacji 
+  - Logowanie za pomocą kodu QR
+
