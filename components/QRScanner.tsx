@@ -7,7 +7,7 @@ import styled from "styled-components/native";
 import { useIsFocused } from "@react-navigation/core";
 import { io, Socket } from "socket.io-client";
 import { BACKEND_URL } from "../config";
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface sizeProps {
     size: number
@@ -48,7 +48,7 @@ export default function QRScanner() {
 
     const handleScanned = async ({data}: {data: string}) => {
         setScanned(true);
-        const accessToken = await SecureStore.getItemAsync('token');
+        const accessToken = await AsyncStorage.getItem('token');
         const socket = io(BACKEND_URL + "/qr", {
             extraHeaders: {
                 Authorization: "Bearer " + accessToken

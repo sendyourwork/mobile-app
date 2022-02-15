@@ -5,7 +5,7 @@ import styled from "styled-components/native";
 import { UserContext } from "../App";
 import { BACKEND_URL } from "../config";
 import { Message as MessageI} from "../interfaces/message"
-import * as SecureStore from "expo-secure-store"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import getChatMessages from "../utils/getChatMessages";
 import { User } from "../interfaces/user";
 
@@ -97,7 +97,7 @@ export default function Chat(): JSX.Element {
         (async() => {
             const res = await getChatMessages((user as User).school_class);
             setMessages(res);
-            const token = await SecureStore.getItemAsync('token');
+            const token = await AsyncStorage.getItem('token');
             const newSocket = io(BACKEND_URL, {
                 extraHeaders: {
                     Authorization: `Bearer ${token}`

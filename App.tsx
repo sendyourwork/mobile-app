@@ -10,9 +10,10 @@ import 'react-native-gesture-handler';
 import Chat from './components/Chat';
 import Drive from './components/Drive';
 import { User } from './interfaces/user';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import getUserData from './utils/getUserData';
 import { ActivityIndicator } from 'react-native';
+import ClassDrive from './components/ClassDrive';
 
 const MainView = styled.View`
   background-color: #111111;
@@ -36,13 +37,13 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleLogOut = async () => {
-    await SecureStore.deleteItemAsync('token');
+    await AsyncStorage.removeItem('token');
     setUserData(null);
   }
 
   useEffect(() => {
     (async () => {
-      const token = await SecureStore.getItemAsync('token');
+      const token = await AsyncStorage.getItem('token');
       if(token) {
         const res = await getUserData(token);
         if(res.user) {
@@ -75,6 +76,7 @@ export default function App() {
               <Drawer.Screen name="QR" component={QRScanner} options={{title: 'Log in with QR code'}}/>
               <Drawer.Screen name="Chat" component={Chat}/>
               <Drawer.Screen name="Drive" component={Drive}/>
+              <Drawer.Screen name="Class Drive" component={ClassDrive}/>
             </Drawer.Navigator>
           </UserContext.Provider>
           :

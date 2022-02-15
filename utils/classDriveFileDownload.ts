@@ -3,10 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 
-export default async function homeDriveFileDownload(filename: string, username: string) {
+export default async function classDriveFileDownload(filename: string, school_class: string, subject: string) {
     const token = await AsyncStorage.getItem('token');
     const file = await FileSystem.downloadAsync(
-        BACKEND_URL + '/userfiles/' + username + '/' + filename,
+        BACKEND_URL + '/files/' + school_class + '/' + subject + '/' + filename,
         FileSystem.documentDirectory + filename,
         {
             headers: {"Authorization": "Bearer " + token}

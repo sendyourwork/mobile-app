@@ -2,7 +2,7 @@ import React, { SetStateAction, useState } from "react"
 import { ActivityIndicator } from "react-native";
 import styled from "styled-components/native";
 import loginWithNameAndPassword from "../utils/loginWithUsernameAndPassword";
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from "../interfaces/user";
 
 const Form = styled.View`
@@ -50,7 +50,7 @@ export default function LoginForm({setUserData}: LoginFormProps) {
             const res = await loginWithNameAndPassword(login, password);
             
             if(res.accessToken) {
-                await SecureStore.setItemAsync('token', res.accessToken)
+                await AsyncStorage.setItem('token', res.accessToken)
                 setUserData(res);
             }
             else {
